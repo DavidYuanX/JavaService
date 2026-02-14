@@ -1,4 +1,11 @@
 /Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/model/User.java
 /Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/CrudApplication.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/config/DataSeeder.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/controller/AuthController.java
 /Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/repository/UserRepository.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/security/JwtAuthFilter.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/config/SecurityConfig.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/repository/AuthUserRepository.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/security/JwtUtil.java
+/Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/model/AuthUser.java
 /Volumes/work/demo/CRUD-App/backend/src/main/java/com/example/crud/controller/UserController.java
