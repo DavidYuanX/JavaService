@@ -1,8 +1,8 @@
 package com.example.crud.config;
 
-import com.example.crud.model.AuthUser;
+import com.example.crud.model.User;
 import com.example.crud.model.Product;
-import com.example.crud.repository.AuthUserRepository;
+import com.example.crud.repository.UserRepository;
 import com.example.crud.repository.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,23 +13,23 @@ import java.util.List;
 @Component
 public class DataSeeder implements CommandLineRunner {
 
-    private final AuthUserRepository authUserRepository;
+    private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataSeeder(AuthUserRepository authUserRepository,
+    public DataSeeder(UserRepository userRepository,
                       ProductRepository productRepository,
                       PasswordEncoder passwordEncoder) {
-        this.authUserRepository = authUserRepository;
+        this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
-        if (authUserRepository.findByUsername("admin").isEmpty()) {
-            AuthUser admin = new AuthUser("admin", passwordEncoder.encode("admin123"));
-            authUserRepository.save(admin);
+        if (userRepository.findByUsername("admin").isEmpty()) {
+            User admin = new User("admin", passwordEncoder.encode("admin123"), User.Role.ADMIN);
+            userRepository.save(admin);
         }
 
         if (productRepository.count() == 0) {

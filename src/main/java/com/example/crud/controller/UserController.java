@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -30,24 +31,25 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // Create new user
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
-    }
-
-    // Update user
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
+    // Update user role (admin only)
+    @PutMapping("/{id}/role")
+    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-        user.setName(userDetails.getName());
-        user.setEmail(userDetails.getEmail());
-        user.setPhone(userDetails.getPhone());
+        String roleStr = body.get("role");
+        if (roleStr == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "角色不能为空"));
+        }
 
-        User updatedUser = userRepository.save(user);
-        return ResponseEntity.ok(updatedUser);
+        try {
+            User.Role role = User.Role.valueOf(roleStr);
+            user.setRole(role);
+            userRepository.save(user);
+            return ResponseEntity.ok(user);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "无效的角色"));
+        }
     }
 
     // Delete user
