@@ -2,6 +2,9 @@ package com.example.crud.controller;
 
 import com.example.crud.model.Product;
 import com.example.crud.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,19 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAllProducts(@RequestParam(required = false) String category) {
+    public Page<Product> getAllProducts(
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (category != null && !category.isBlank()) {
+            return productRepository.findByCategory(category.trim(), pageable);
+        }
+        return productRepository.findAll(pageable);
+    }
+
+    @GetMapping("/all")
+    public List<Product> getAllProductsNoPaging(@RequestParam(required = false) String category) {
         if (category != null && !category.isBlank()) {
             return productRepository.findByCategory(category.trim());
         }
@@ -39,11 +54,15 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<Product> searchProducts(@RequestParam String keyword) {
+    public Page<Product> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         if (keyword == null || keyword.isBlank()) {
-            return productRepository.findAll();
+            return productRepository.findAll(pageable);
         }
-        return productRepository.searchByKeyword(keyword.trim());
+        return productRepository.searchByKeyword(keyword.trim(), pageable);
     }
 
     @PostMapping
