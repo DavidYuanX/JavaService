@@ -2,8 +2,10 @@ package com.example.crud.config;
 
 import com.example.crud.model.User;
 import com.example.crud.model.Product;
+import com.example.crud.model.Banner;
 import com.example.crud.repository.UserRepository;
 import com.example.crud.repository.ProductRepository;
+import com.example.crud.repository.BannerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,13 +17,16 @@ public class DataSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final BannerRepository bannerRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataSeeder(UserRepository userRepository,
                       ProductRepository productRepository,
+                      BannerRepository bannerRepository,
                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.bannerRepository = bannerRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -32,11 +37,25 @@ public class DataSeeder implements CommandLineRunner {
             userRepository.save(admin);
         }
 
+        // 初始化Banner数据
+        if (bannerRepository.count() == 0) {
+            seedBanners();
+        }
+
         // 如果商品数量少于预期，清空并重新初始化
         if (productRepository.count() < 2000) {
             productRepository.deleteAll();
             seedProducts();
         }
+    }
+
+    private void seedBanners() {
+        List<Banner> banners = List.of(
+            new Banner("春季大促 全场低至5折", "限时特惠，错过等一年", null, "#1a1a2e"),
+            new Banner("数码新品 限时特惠", "最新数码产品首发优惠", null, "#16213e"),
+            new Banner("每日坚果 买二送一", "健康零食，天天特价", null, "#0f3460")
+        );
+        bannerRepository.saveAll(banners);
     }
 
     private void seedProducts() {
