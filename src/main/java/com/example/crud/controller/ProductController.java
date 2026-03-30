@@ -1,5 +1,6 @@
 package com.example.crud.controller;
 
+import com.example.crud.exception.ResourceNotFoundException;
 import com.example.crud.model.Product;
 import com.example.crud.repository.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("商品不存在: " + id));
         return ResponseEntity.ok(product);
     }
 
@@ -73,7 +74,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product details) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("商品不存在: " + id));
 
         product.setName(details.getName());
         product.setDescription(details.getDescription());
@@ -90,7 +91,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("商品不存在: " + id));
         productRepository.delete(product);
         return ResponseEntity.noContent().build();
     }

@@ -14,6 +14,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    private static final String ROLE_CLAIM = "role";
+
     @Value("${jwt.secret:crud-app-jwt-secret-key-at-least-256-bits-for-hs256}")
     private String secret;
 
@@ -30,9 +32,10 @@ public class JwtUtil {
         return new SecretKeySpec(keyBytes, ALGORITHM);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim(ROLE_CLAIM, role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(SignatureAlgorithm.HS256, getSigningKey())
@@ -46,6 +49,15 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
+    }
+
+    public String getRoleFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get(ROLE_CLAIM, String.class);
     }
 
     public boolean validateToken(String token) {

@@ -1,14 +1,19 @@
 package com.example.crud.controller;
 
+import com.example.crud.exception.ResourceNotFoundException;
 import com.example.crud.model.Order;
 import com.example.crud.model.OrderItem;
 import com.example.crud.repository.OrderRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -29,7 +34,7 @@ public class OrderController {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> itemsData = (List<Map<String, Object>>) body.get("items");
         if (itemsData == null || itemsData.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "订单商品不能为空"));
+            throw new ResponseStatusException(BAD_REQUEST, "订单商品不能为空");
         }
 
         Order order = new Order();
@@ -69,9 +74,9 @@ public class OrderController {
     public ResponseEntity<Order> getOrderById(@PathVariable Long id,
                                               Authentication authentication) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("订单不存在: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("订单不存在: " + id));
         if (!order.getUsername().equals(authentication.getName())) {
-            return ResponseEntity.status(403).build();
+            throw new AccessDeniedException("无权访问该订单");
         }
         return ResponseEntity.ok(order);
     }
@@ -81,14 +86,14 @@ public class OrderController {
                                                    @RequestBody Map<String, String> body,
                                                    Authentication authentication) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("订单不存在: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("订单不存在: " + id));
         if (!order.getUsername().equals(authentication.getName())) {
-            return ResponseEntity.status(403).build();
+            throw new AccessDeniedException("无权修改该订单");
         }
 
         String newStatus = body.get("status");
         if (newStatus == null || newStatus.isBlank()) {
-            return ResponseEntity.badRequest().build();
+            throw new ResponseStatusException(BAD_REQUEST, "订单状态不能为空");
         }
         order.setStatus(newStatus.trim());
         return ResponseEntity.ok(orderRepository.save(order));
@@ -98,9 +103,9 @@ public class OrderController {
     public ResponseEntity<Void> cancelOrder(@PathVariable Long id,
                                             Authentication authentication) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("订单不存在: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("订单不存在: " + id));
         if (!order.getUsername().equals(authentication.getName())) {
-            return ResponseEntity.status(403).build();
+            throw new AccessDeniedException("无权取消该订单");
         }
         order.setStatus("已取消");
         orderRepository.save(order);

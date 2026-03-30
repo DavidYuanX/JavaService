@@ -2,6 +2,12 @@
 cd "$(dirname "$0")"
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-22.jdk/Contents/Home
 
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 PORT=8080
 
 # 检查端口占用
@@ -18,4 +24,4 @@ if [ -n "$PID" ]; then
     fi
 fi
 
-mvn spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.profiles=dev

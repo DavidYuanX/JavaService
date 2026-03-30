@@ -1,5 +1,6 @@
 package com.example.crud.controller;
 
+import com.example.crud.exception.ResourceNotFoundException;
 import com.example.crud.model.Banner;
 import com.example.crud.repository.BannerRepository;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class BannerController {
     @GetMapping("/{id}")
     public ResponseEntity<Banner> getBannerById(@PathVariable Long id) {
         Banner banner = bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Banner 不存在: " + id));
         return ResponseEntity.ok(banner);
     }
 
@@ -43,7 +44,7 @@ public class BannerController {
     @PutMapping("/{id}")
     public ResponseEntity<Banner> updateBanner(@PathVariable Long id, @RequestBody Banner details) {
         Banner banner = bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Banner 不存在: " + id));
 
         banner.setTitle(details.getTitle());
         banner.setSubtitle(details.getSubtitle());
@@ -60,7 +61,7 @@ public class BannerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBanner(@PathVariable Long id) {
         Banner banner = bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Banner 不存在: " + id));
         bannerRepository.delete(banner);
         return ResponseEntity.noContent().build();
     }
